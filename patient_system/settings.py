@@ -69,12 +69,31 @@ WSGI_APPLICATION = 'patient_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# SQLite Configuration (Active - MariaDB version too old)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'database' / 'db.sqlite3',
     }
 }
+
+# MySQL/MariaDB Configuration (Requires MySQL 8.0+ or MariaDB 10.6+)
+# Current System: MariaDB 10.4.28 (too old - need to upgrade)
+# To use MySQL/MariaDB, uncomment below and comment SQLite above
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'patient_records_db',
+#         'USER': 'root',
+#         'PASSWORD': '',  # Empty password
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#             'charset': 'utf8mb4',
+#         },
+#     }
+# }
 
 
 # Password validation

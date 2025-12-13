@@ -43,4 +43,5 @@ class MedicationAdmin(admin.ModelAdmin):
     list_filter = ['is_active', 'start_date']
     search_fields = ['medication_name', 'purpose']
 
+# Register CustomUser with custom admin
 admin.site.register(CustomUser, CustomUserAdmin)
