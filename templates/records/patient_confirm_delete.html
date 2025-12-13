@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Patient{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete the patient record for:</p>
+        <h4>{{ patient.first_name }} {{ patient.last_name }} ({{ patient.patient_id }})</h4>
+        <p class="text-danger"><strong>Warning:</strong> This action cannot be undone. All medical history, diagnoses, allergies, and medications will be permanently deleted.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="btn btn-danger-modern">
+                    <i class="fas fa-trash"></i> Yes, Delete
+                </button>
+                <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

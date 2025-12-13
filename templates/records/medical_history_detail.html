@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical History Details{% endblock %}
+
+{% block content %}
+<div class="medical-history-detail-container">
+    <div class="page-header">
+        <h1><i class="fas fa-file-medical"></i> Medical History</h1>
+        <a href="{% url 'patient_detail' medical_history.patient.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Patient
+        </a>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Main Info Card -->
+        <div class="col-md-8">
+            <div class="modern-card">
+                <div class="card-header-modern">
+                    <h5>Record Details</h5>
+                    <span class="badge badge-info">{{ medical_history.date_recorded|date:"F d, Y g:i A" }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="detail-section">
+                        <h6><i class="fas fa-user"></i> Patient</h6>
+                        <p>{{ medical_history.patient.first_name }} {{ medical_history.patient.last_name }} ({{ medical_history.patient.patient_id }})</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h6><i class="fas fa-user-md"></i> Recorded By</h6>
+                        <p>{{ medical_history.recorded_by.get_full_name }} ({{ medical_history.recorded_by.get_role_display }})</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h6><i class="fas fa-notes-medical"></i> Chief Complaint</h6>
+                        <p>{{ medical_history.chief_complaint }}</p>
+                    </div>
+                    
+                    {% if medical_history.physical_examination %}
+                    <div class="detail-section">
+                        <h6><i class="fas fa-stethoscope"></i> Physical Examination</h6>
+                        <p>{{ medical_history.physical_examination }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if medical_history.notes %}
+                    <div class="detail-section">
+                        <h6><i class="fas fa-sticky-note"></i> Additional Notes</h6>
+                        <p>{{ medical_history.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="col-md-4">
+            <div class="modern-card">
+                <div class="card-header-modern">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'add_diagnosis' medical_history.pk %}" class="btn btn-primary-modern">
+                            <i class="fas fa-plus"></i> Add Diagnosis
+                        </a>
+                        <a href="{% url 'add_allergy' medical_history.pk %}" class="btn btn-warning">
+                            <i class="fas fa-plus"></i> Add Allergy
+                        </a>
+                        <a href="{% url 'add_medication' medical_history.pk %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add Medication
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Diagnoses Section -->
+    <div class="modern-card mt-4">
+        <div class="card-header-modern">
+            <h5><i class="fas fa-diagnoses"></i> Diagnoses</h5>
+        </div>
+        <div class="card-body">
+            {% if diagnoses %}
+                <div class="diagnoses-grid">
+                    {% for diagnosis in diagnoses %}
+                    <div class="diagnosis-card severity-{{ diagnosis.severity }}">
+                        <div class="diagnosis-header">
+                            <h6>{{ diagnosis.diagnosis_name }}</h6>
+                            <span class="severity-badge">{{ diagnosis.get_severity_display }}</span>
+                        </div>
+                        <p class="diagnosis-desc">{{ diagnosis.description }}</p>
+                        <div class="diagnosis-meta">
+                            <span><i class="fas fa-calendar"></i> {{ diagnosis.diagnosis_date|date:"M d, Y" }}</span>
+                            {% if diagnosis.icd_code %}
+                            <span><i class="fas fa-code"></i> {{ diagnosis.icd_code }}</span>
+                            {% endif %}
+                            <span class="badge badge-secondary">{{ diagnosis.status }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No diagnoses recorded for this visit.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Allergies Section -->
+    <div class="modern-card mt-4">
+        <div class="card-header-modern">
+            <h5><i class="fas fa-exclamation-triangle"></i> Allergies</h5>
+        </div>
+        <div class="card-body">
+            {% if allergies %}
+                <div class="allergies-grid">
+                    {% for allergy in allergies %}
+                    <div class="allergy-card severity-{{ allergy.severity }}">
+                        <div class="allergy-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h6>{{ allergy.allergen }}</h6>
+                        <p>{{ allergy.reaction }}</p>
+                        <span class="severity-badge">{{ allergy.get_severity_display }}</span>
+                        <small>Identified: {{ allergy.identified_date|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No allergies recorded for this visit.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Medications Section -->
+    <div class="modern-card mt-4">
+        <div class="card-header-modern">
+            <h5><i class="fas fa-pills"></i> Medications</h5>
+        </div>
+        <div class="card-body">
+            {% if medications %}
+                <div class="medications-list">
+                    {% for medication in medications %}
+                    <div class="medication-card {% if medication.is_active %}active{% else %}inactive{% endif %}">
+                        <div class="medication-header">
+                            <div>
+                                <h6>{{ medication.medication_name }}</h6>
+                                <span class="dosage-badge">{{ medication.dosage }}</span>
+                            </div>
+                            <span class="status-badge">
+                                {% if medication.is_active %}
+                                    <i class="fas fa-check-circle"></i> Active
+                                {% else %}
+                                    <i class="fas fa-times-circle"></i> Inactive
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="medication-body">
+                            <p><strong>Frequency:</strong> {{ medication.frequency }}</p>
+                            <p><strong>Route:</strong> {{ medication.route }}</p>
+                            <p><strong>Purpose:</strong> {{ medication.purpose }}</p>
+                            <p><strong>Period:</strong> {{ medication.start_date|date:"M d, Y" }} 
+                                {% if medication.end_date %} - {{ medication.end_date|date:"M d, Y" }}{% else %} - Ongoing{% endif %}</p>
+                            {% if medication.prescribed_by %}
+                            <p><strong>Prescribed by:</strong> {{ medication.prescribed_by.get_full_name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No medications prescribed during this visit.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

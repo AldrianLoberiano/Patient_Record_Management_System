@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <h1><i class="fas fa-th-large"></i> Dashboard</h1>
+        <p class="text-muted">Welcome back, {{ user.get_full_name }}!</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card stat-card-blue">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ total_patients }}</h3>
+                    <p>Total Patients</p>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card stat-card-green">
+                <div class="stat-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ total_doctors }}</h3>
+                    <p>Doctors</p>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card stat-card-purple">
+                <div class="stat-icon">
+                    <i class="fas fa-user-nurse"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ total_nurses }}</h3>
+                    <p>Nurses</p>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="stat-card stat-card-orange">
+                <div class="stat-icon">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ total_records }}</h3>
+                    <p>Medical Records</p>
+                </div>
+                <div class="stat-progress">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Patients -->
+    <div class="row">
+        <div class="col-12">
+            <div class="modern-card">
+                <div class="card-header-modern">
+                    <h5><i class="fas fa-clock"></i> Recent Patients</h5>
+                    <a href="{% url 'patient_list' %}" class="btn btn-sm btn-primary-modern">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_patients %}
+                    <div class="table-responsive">
+                        <table class="table modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Patient ID</th>
+                                    <th>Name</th>
+                                    <th>Gender</th>
+                                    <th>Blood Group</th>
+                                    <th>Phone</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in recent_patients %}
+                                <tr>
+                                    <td><span class="badge badge-id">{{ patient.patient_id }}</span></td>
+                                    <td>
+                                        <div class="patient-info">
+                                            {% if patient.photo %}
+                                                <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}">
+                                            {% else %}
+                                                <div class="patient-avatar">{{ patient.first_name.0 }}{{ patient.last_name.0 }}</div>
+                                            {% endif %}
+                                            <span>{{ patient.first_name }} {{ patient.last_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if patient.gender == 'M' %}
+                                            <span class="badge badge-info"><i class="fas fa-mars"></i> Male</span>
+                                        {% elif patient.gender == 'F' %}
+                                            <span class="badge badge-pink"><i class="fas fa-venus"></i> Female</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Other</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge badge-blood">{{ patient.blood_group|default:"N/A" }}</span></td>
+                                    <td>{{ patient.phone }}</td>
+                                    <td>{{ patient.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-action" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No patients registered yet</p>
+                        <a href="{% url 'patient_create' %}" class="btn btn-primary-modern">Register First Patient</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

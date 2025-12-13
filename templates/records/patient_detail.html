@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ patient.first_name }} {{ patient.last_name }} - Patient Details{% endblock %}
+
+{% block content %}
+<div class="patient-detail-container">
+    <!-- Patient Header Card -->
+    <div class="patient-header-card">
+        <div class="row align-items-center">
+            <div class="col-md-auto">
+                <div class="patient-photo-large">
+                    {% if patient.photo %}
+                        <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}">
+                    {% else %}
+                        <div class="patient-initials-large">{{ patient.first_name.0 }}{{ patient.last_name.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="patient-header-info">
+                    <h2>{{ patient.first_name }} {{ patient.last_name }}</h2>
+                    <span class="badge badge-id-large">{{ patient.patient_id }}</span>
+                    
+                    <div class="patient-meta">
+                        <span><i class="fas fa-calendar"></i> DOB: {{ patient.date_of_birth|date:"M d, Y" }}</span>
+                        <span><i class="fas fa-phone"></i> {{ patient.phone }}</span>
+                        {% if patient.email %}
+                        <span><i class="fas fa-envelope"></i> {{ patient.email }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-auto">
+                <div class="action-buttons">
+                    <a href="{% url 'patient_update' patient.pk %}" class="btn btn-edit-modern">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'medical_history_create' patient.pk %}" class="btn btn-primary-modern">
+                        <i class="fas fa-plus"></i> Add Record
+                    </a>
+                    <a href="{% url 'patient_delete' patient.pk %}" class="btn btn-danger-modern">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Info Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="info-card info-card-blue">
+                <i class="fas fa-tint"></i>
+                <div>
+                    <h6>Blood Group</h6>
+                    <p>{{ patient.blood_group|default:"Not Specified" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-card info-card-pink">
+                <i class="fas fa-venus-mars"></i>
+                <div>
+                    <h6>Gender</h6>
+                    <p>{{ patient.get_gender_display }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-card info-card-green">
+                <i class="fas fa-file-medical"></i>
+                <div>
+                    <h6>Medical Records</h6>
+                    <p>{{ medical_histories.count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="info-card info-card-orange">
+                <i class="fas fa-pills"></i>
+                <div>
+                    <h6>Active Medications</h6>
+                    <p>{{ all_medications.count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabs -->
+    <ul class="nav nav-tabs modern-tabs" id="patientTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">
+                <i class="fas fa-info-circle"></i> Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">
+                <i class="fas fa-history"></i> Medical History
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="diagnoses-tab" data-bs-toggle="tab" data-bs-target="#diagnoses" type="button">
+                <i class="fas fa-stethoscope"></i> Diagnoses
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="allergies-tab" data-bs-toggle="tab" data-bs-target="#allergies" type="button">
+                <i class="fas fa-exclamation-triangle"></i> Allergies
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="medications-tab" data-bs-toggle="tab" data-bs-target="#medications" type="button">
+                <i class="fas fa-pills"></i> Medications
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content modern-tab-content" id="patientTabsContent">
+        <!-- Overview Tab -->
+        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="detail-card">
+                        <h5><i class="fas fa-user"></i> Personal Information</h5>
+                        <table class="detail-table">
+                            <tr>
+                                <th>Full Name:</th>
+                                <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Date of Birth:</th>
+                                <td>{{ patient.date_of_birth|date:"F d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Gender:</th>
+                                <td>{{ patient.get_gender_display }}</td>
+                            </tr>
+                            <tr>
+                                <th>Blood Group:</th>
+                                <td>{{ patient.blood_group|default:"Not Specified" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-card">
+                        <h5><i class="fas fa-address-book"></i> Contact Information</h5>
+                        <table class="detail-table">
+                            <tr>
+                                <th>Phone:</th>
+                                <td>{{ patient.phone }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td>{{ patient.email|default:"Not Provided" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Address:</th>
+                                <td>{{ patient.address }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-card">
+                        <h5><i class="fas fa-phone-square"></i> Emergency Contact</h5>
+                        <table class="detail-table">
+                            <tr>
+                                <th>Name:</th>
+                                <td>{{ patient.emergency_contact_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone:</th>
+                                <td>{{ patient.emergency_contact_phone }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="detail-card">
+                        <h5><i class="fas fa-info"></i> Registration Info</h5>
+                        <table class="detail-table">
+                            <tr>
+                                <th>Registered By:</th>
+                                <td>{{ patient.registered_by.get_full_name|default:"N/A" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Registration Date:</th>
+                                <td>{{ patient.created_at|date:"F d, Y g:i A" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated:</th>
+                                <td>{{ patient.updated_at|date:"F d, Y g:i A" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Medical History Tab -->
+        <div class="tab-pane fade" id="history" role="tabpanel">
+            {% if medical_histories %}
+                {% for history in medical_histories %}
+                <div class="medical-history-card">
+                    <div class="history-header">
+                        <h5><i class="fas fa-notes-medical"></i> Record from {{ history.date_recorded|date:"F d, Y" }}</h5>
+                        <span class="badge badge-success">By: {{ history.recorded_by.get_full_name }}</span>
+                    </div>
+                    <div class="history-body">
+                        <p><strong>Chief Complaint:</strong> {{ history.chief_complaint }}</p>
+                        {% if history.physical_examination %}
+                        <p><strong>Physical Examination:</strong> {{ history.physical_examination }}</p>
+                        {% endif %}
+                        {% if history.notes %}
+                        <p><strong>Notes:</strong> {{ history.notes }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="history-footer">
+                        <a href="{% url 'medical_history_detail' history.pk %}" class="btn btn-sm btn-primary-modern">
+                            View Full Details <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-file-medical"></i>
+                    <p>No medical history records yet</p>
+                    <a href="{% url 'medical_history_create' patient.pk %}" class="btn btn-primary-modern">Add First Record</a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Diagnoses Tab -->
+        <div class="tab-pane fade" id="diagnoses" role="tabpanel">
+            {% if all_diagnoses %}
+                <div class="diagnoses-grid">
+                    {% for diagnosis in all_diagnoses %}
+                    <div class="diagnosis-card severity-{{ diagnosis.severity }}">
+                        <div class="diagnosis-header">
+                            <h6>{{ diagnosis.diagnosis_name }}</h6>
+                            <span class="severity-badge">{{ diagnosis.get_severity_display }}</span>
+                        </div>
+                        <p class="diagnosis-desc">{{ diagnosis.description }}</p>
+                        <div class="diagnosis-meta">
+                            <span><i class="fas fa-calendar"></i> {{ diagnosis.diagnosis_date|date:"M d, Y" }}</span>
+                            {% if diagnosis.icd_code %}
+                            <span><i class="fas fa-code"></i> {{ diagnosis.icd_code }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-stethoscope"></i>
+                    <p>No diagnoses recorded</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Allergies Tab -->
+        <div class="tab-pane fade" id="allergies" role="tabpanel">
+            {% if all_allergies %}
+                <div class="allergies-grid">
+                    {% for allergy in all_allergies %}
+                    <div class="allergy-card severity-{{ allergy.severity }}">
+                        <div class="allergy-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h6>{{ allergy.allergen }}</h6>
+                        <p>{{ allergy.reaction }}</p>
+                        <span class="severity-badge">{{ allergy.get_severity_display }}</span>
+                        <small>Identified: {{ allergy.identified_date|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-shield-alt"></i>
+                    <p>No known allergies</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Medications Tab -->
+        <div class="tab-pane fade" id="medications" role="tabpanel">
+            {% if all_medications %}
+                <div class="medications-list">
+                    {% for medication in all_medications %}
+                    <div class="medication-card {% if medication.is_active %}active{% else %}inactive{% endif %}">
+                        <div class="medication-header">
+                            <div>
+                                <h6>{{ medication.medication_name }}</h6>
+                                <span class="dosage-badge">{{ medication.dosage }}</span>
+                            </div>
+                            <span class="status-badge">
+                                {% if medication.is_active %}
+                                    <i class="fas fa-check-circle"></i> Active
+                                {% else %}
+                                    <i class="fas fa-times-circle"></i> Inactive
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="medication-body">
+                            <p><strong>Frequency:</strong> {{ medication.frequency }}</p>
+                            <p><strong>Route:</strong> {{ medication.route }}</p>
+                            <p><strong>Purpose:</strong> {{ medication.purpose }}</p>
+                            <p><strong>Period:</strong> {{ medication.start_date|date:"M d, Y" }} 
+                                {% if medication.end_date %} - {{ medication.end_date|date:"M d, Y" }}{% else %} - Ongoing{% endif %}</p>
+                            {% if medication.prescribed_by %}
+                            <p><strong>Prescribed by:</strong> {{ medication.prescribed_by.get_full_name }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-pills"></i>
+                    <p>No active medications</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

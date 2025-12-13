@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Patient Record System{% endblock %}
+
+{% block guest_content %}
+<div class="login-container">
+    <div class="login-background">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-circle">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <h2>Welcome Back!</h2>
+            <p>Patient Record Management System</p>
+        </div>
+        
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            
+            <div class="form-floating mb-3">
+                {{ form.username }}
+                <label for="{{ form.username.id_for_label }}">
+                    <i class="fas fa-user"></i> Username
+                </label>
+            </div>
+            
+            <div class="form-floating mb-4">
+                {{ form.password }}
+                <label for="{{ form.password.id_for_label }}">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-login">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+        
+        <div class="login-footer">
+            <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
