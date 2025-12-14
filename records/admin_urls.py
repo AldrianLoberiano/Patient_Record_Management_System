@@ -26,6 +26,7 @@ urlpatterns = [
     
     # Diagnosis Management
     path('diagnoses/', admin_views.diagnosis_list_view, name='diagnosis_list'),
+    path('diagnoses/create/', admin_views.diagnosis_create_view, name='diagnosis_create'),
     
     # Medication Management
     path('medications/', admin_views.medication_list_view, name='medication_list'),

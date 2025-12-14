@@ -13,6 +13,9 @@
                 </h1>
                 <p style="color: #666;">Review patient diagnosis history and medical assessments</p>
             </div>
+            <button onclick="openDiagnosisModal()" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.3);">
+                <i class="fas fa-plus-circle"></i> Add New Diagnosis
+            </button>
         </div>
     </div>
     
@@ -193,4 +196,174 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Add Diagnosis Modal -->
+<div id="diagnosisModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; overflow-y: auto;">
+    <div style="min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div style="background: var(--card-bg); border-radius: 20px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <!-- Modal Header -->
+            <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2rem; border-radius: 20px 20px 0 0; position: sticky; top: 0; z-index: 10;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 1.75rem; font-weight: 700; margin: 0;">
+                        <i class="fas fa-plus-circle"></i> Add New Diagnosis
+                    </h2>
+                    <button onclick="closeDiagnosisModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div style="padding: 2rem;">
+                <form method="post" action="{% url 'custom_admin:diagnosis_create' %}" id="diagnosisForm">
+                    {% csrf_token %}
+                    
+                    <!-- Patient Selection -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-user-circle"></i> Patient
+                        </h3>
+                        
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                Select Patient <span style="color: #ff6b6b;">*</span>
+                            </label>
+                            <select name="patient" required class="form-control">
+                                <option value="">Select a patient</option>
+                                {% for patient in patients %}
+                                <option value="{{ patient.pk }}">{{ patient.first_name }} {{ patient.last_name }} - {{ patient.patient_id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Diagnosis Details -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-stethoscope"></i> Diagnosis Information
+                        </h3>
+                        
+                        <div style="display: grid; gap: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Diagnosis Name <span style="color: #ff6b6b;">*</span>
+                                </label>
+                                <input type="text" name="diagnosis_name" required class="form-control" placeholder="e.g., Hypertension, Type 2 Diabetes">
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                        ICD Code
+                                    </label>
+                                    <input type="text" name="icd_code" class="form-control" placeholder="e.g., I10">
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                        Diagnosis Date <span style="color: #ff6b6b;">*</span>
+                                    </label>
+                                    <input type="date" name="diagnosis_date" required class="form-control">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                        Severity <span style="color: #ff6b6b;">*</span>
+                                    </label>
+                                    <select name="severity" required class="form-control">
+                                        <option value="">Select severity</option>
+                                        <option value="mild">Mild</option>
+                                        <option value="moderate">Moderate</option>
+                                        <option value="severe">Severe</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                        Status <span style="color: #ff6b6b;">*</span>
+                                    </label>
+                                    <select name="status" required class="form-control">
+                                        <option value="">Select status</option>
+                                        <option value="active">Active</option>
+                                        <option value="resolved">Resolved</option>
+                                        <option value="chronic">Chronic</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Description
+                                </label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Additional details about the diagnosis"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 2px solid var(--border); justify-content: flex-end;">
+                        <button type="button" onclick="closeDiagnosisModal()" class="btn btn-white">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; box-shadow: 0 4px 15px rgba(102,126,234,0.3);">
+                            <i class="fas fa-save"></i> Save Diagnosis
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: var(--card-bg);
+        color: var(--text-primary);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+    }
+</style>
+
+<script>
+    function openDiagnosisModal() {
+        document.getElementById('diagnosisModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeDiagnosisModal() {
+        document.getElementById('diagnosisModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('diagnosisModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDiagnosisModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('diagnosisModal').style.display === 'block') {
+            closeDiagnosisModal();
+        }
+    });
+</script>
 {% endblock %}

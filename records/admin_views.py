@@ -279,6 +279,9 @@ def diagnosis_list_view(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Get all patients for the modal dropdown
+    patients = Patient.objects.all().order_by('first_name', 'last_name')
+    
     context = {
         'page_obj': page_obj,
         'query': query,
@@ -286,8 +289,45 @@ def diagnosis_list_view(request):
         'total_count': total_count,
         'unique_patients': unique_patients,
         'this_month_count': this_month_count,
+        'patients': patients,
     }
     return render(request, 'custom_admin/diagnosis_list.html', context)
+
+
+@login_required
+@user_passes_test(is_staff_or_admin)
+def diagnosis_create_view(request):
+    """Create new diagnosis"""
+    if request.method == 'POST':
+        # Get patient from form
+        patient_id = request.POST.get('patient')
+        patient = get_object_or_404(Patient, pk=patient_id)
+        
+        # Get or create medical history for this patient
+        medical_history = MedicalHistory.objects.filter(patient=patient).first()
+        if not medical_history:
+            medical_history = MedicalHistory.objects.create(
+                patient=patient,
+                recorded_by=request.user,
+                chief_complaint='Diagnosis record',
+                notes='Created for diagnosis entry'
+            )
+        
+        # Create diagnosis
+        diagnosis = Diagnosis.objects.create(
+            medical_history=medical_history,
+            diagnosis_name=request.POST.get('diagnosis_name'),
+            diagnosis_date=request.POST.get('diagnosis_date'),
+            severity=request.POST.get('severity'),
+            status=request.POST.get('status'),
+            icd_code=request.POST.get('icd_code', ''),
+            description=request.POST.get('description', '')
+        )
+        
+        messages.success(request, f'Diagnosis "{diagnosis.diagnosis_name}" created successfully for {patient.first_name} {patient.last_name}!')
+        return redirect('custom_admin:diagnosis_list')
+    
+    return redirect('custom_admin:diagnosis_list')
 
 
 @login_required
