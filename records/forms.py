@@ -14,6 +14,28 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['profile_picture'].widget.attrs.update({'class': 'form-control-file'})
 
 
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'email', 'phone', 'specialization', 'license_number', 'profile_picture']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'placeholder': 'Enter your first name'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Enter your last name'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Enter your email'}),
+            'phone': forms.TextInput(attrs={'placeholder': 'Enter phone number'}),
+            'specialization': forms.TextInput(attrs={'placeholder': 'e.g., Cardiology, Pediatrics'}),
+            'license_number': forms.TextInput(attrs={'placeholder': 'Medical license number'}),
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            if field != 'profile_picture':
+                self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                self.fields[field].widget.attrs.update({'class': 'form-control-file'})
+
+
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
@@ -71,6 +93,12 @@ class DiagnosisForm(forms.ModelForm):
 
 
 class AllergyForm(forms.ModelForm):
+    patient = forms.ModelChoiceField(
+        queryset=Patient.objects.all(),
+        required=True,
+        help_text="Select the patient for this allergy"
+    )
+    
     class Meta:
         model = Allergy
         fields = ['allergen', 'reaction', 'severity', 'identified_date', 'notes']
@@ -82,8 +110,16 @@ class AllergyForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Apply form-control class to all fields
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-control'})
+        
+        # If editing existing allergy, set patient from medical_history
+        if self.instance and self.instance.pk:
+            self.fields['patient'].initial = self.instance.medical_history.patient
+            self.fields['patient'].widget.attrs['disabled'] = True
+            self.fields['patient'].required = False
 
 
 class MedicationForm(forms.ModelForm):

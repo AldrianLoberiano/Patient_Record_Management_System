@@ -7,7 +7,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Custom Admin (Not Django's built-in admin)
+    path('management/', include('records.admin_urls')),
+    
+    # Django admin for OAuth configuration only
+    path('django-admin/', admin.site.urls),
+    
+    # Social Authentication (Allauth)
+    path('accounts/', include('allauth.urls')),
+    
+    # Main application URLs
     path('', include('records.urls')),
 ]
 

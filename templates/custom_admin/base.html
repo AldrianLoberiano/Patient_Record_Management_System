@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediCare Admin{% endblock %}</title>
+    {% load static %}
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --purple-start: #56CCF2;
+            --purple-end: #2F80ED;
+            --success: #00B894;
+            --warning: #FDCB6E;
+            --danger: #FF6B6B;
+            --info: #74B9FF;
+            --dark: #2D3436;
+            --light: #F8F9FA;
+            --border: rgba(86, 204, 242, 0.15);
+            --header-bg: rgba(255, 255, 255, 0.1);
+            --header-border: rgba(255, 255, 255, 0.2);
+            --card-bg: #ffffff;
+            --text-primary: #2D3436;
+            --text-secondary: #666;
+            --bg-gradient-start: #56CCF2;
+            --bg-gradient-end: #2F80ED;
+        }
+        
+        body.dark-mode {
+            --header-bg: rgba(0, 0, 0, 0.3);
+            --header-border: rgba(255, 255, 255, 0.1);
+            --card-bg: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --bg-gradient-start: #1a202c;
+            --bg-gradient-end: #2d3748;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+        
+        /* Header */
+        .admin-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid var(--header-border);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .brand-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .brand-text h1 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .brand-text p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-left: auto;
+        }
+        
+        .user-info {
+            color: white;
+            font-weight: 500;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-white {
+            background: white;
+            color: var(--purple-start);
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Layout Container */
+        .admin-layout {
+            display: flex;
+            min-height: calc(100vh - 100px);
+        }
+        
+        /* Sidebar Navigation */
+        .admin-sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            padding: 2rem 1rem;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--purple-start);
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+        
+        .nav-item:hover {
+            background: rgba(108, 92, 231, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .nav-item:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            font-weight: 600;
+        }
+        
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+        
+        .nav-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        }
+        
+        .nav-item:hover .nav-icon {
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+        }
+        
+        .nav-item:hover .nav-icon i {
+            color: white !important;
+        }
+        
+        .nav-item.active .nav-icon {
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+        }
+        
+        .nav-item.active .nav-icon i {
+            color: white !important;
+        }
+        
+        .nav-icon i {
+            color: var(--purple-start);
+            transition: all 0.3s;
+        }
+        
+        .nav-text {
+            flex: 1;
+        }
+        
+        .nav-text h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.15rem;
+        }
+        
+        .nav-text p {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        /* Main Content Area */
+        .admin-main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* Main Content */
+        .admin-content {
+            width: 100%;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.purple { background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); }
+        .stat-icon.success { background: linear-gradient(135deg, #6bcf7f, #4caf50); }
+        .stat-icon.warning { background: linear-gradient(135deg, #ffd93d, #ff9800); }
+        .stat-icon.danger { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table tr:hover {
+            background: rgba(108, 92, 231, 0.05);
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge.severe { background: #ff6b6b; color: white; }
+        .badge.moderate { background: #ffd93d; color: #333; }
+        .badge.mild { background: #6bcf7f; color: white; }
+        
+        /* User Dropdown Menu */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1rem;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .user-dropdown-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .user-dropdown.active .user-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .dropdown-header-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .dropdown-header-email {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(86, 204, 242, 0.1);
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--purple-start);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 0.5rem 0;
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            color: var(--dark);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.dark-mode .theme-toggle {
+            background: #4a5568;
+            color: #fbbf24;
+        }
+        
+        .theme-toggle .icon-sun,
+        body.dark-mode .theme-toggle .icon-moon {
+            display: none;
+        }
+        
+        body.dark-mode .theme-toggle .icon-sun {
+            display: block;
+        }
+        
+        .theme-toggle .icon-moon {
+            display: block;
+        }
+        
+        /* Scrollbar Styling */
+        .admin-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--purple-start), var(--purple-end));
+            border-radius: 10px;
+        }
+        
+        /* Hamburger Menu Button */
+        .hamburger-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px;
+            transition: all 0.3s;
+        }
+        
+        .hamburger-btn span {
+            width: 24px;
+            height: 3px;
+            background: var(--purple-start);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        
+        .hamburger-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+        
+        /* Mobile Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .sidebar-overlay.active {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .hamburger-btn {
+                display: flex;
+            }
+            
+            .header-content {
+                gap: 1rem;
+            }
+            
+            .admin-layout {
+                position: relative;
+            }
+            
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 280px;
+                height: 100vh;
+                z-index: 999;
+                transition: left 0.3s;
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            }
+            
+            .admin-sidebar.active {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: block;
+            }
+            
+            .admin-main {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.2rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <button class="hamburger-btn" id="hamburgerBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <a href="{% url 'custom_admin:dashboard' %}" class="brand">
+                <div class="brand-icon">
+                    <i class="fas fa-hospital-user"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>MediCare Admin</h1>
+                    <p>Patient Record Management</p>
+                </div>
+            </a>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                    <i class="fas fa-moon icon-moon"></i>
+                    <i class="fas fa-sun icon-sun"></i>
+                </button>
+                
+                <div class="user-dropdown" id="userDropdown">
+                    <button class="user-dropdown-btn" id="userDropdownBtn">
+                        <div class="user-avatar">
+                            {% if user.first_name %}
+                                {{ user.first_name.0 }}{{ user.last_name.0|default:"" }}
+                            {% else %}
+                                {{ user.username.0|upper }}
+                            {% endif %}
+                        </div>
+                        <div style="text-align: left;">
+                            <div style="font-size: 0.9rem; font-weight: 600;">{{ user.get_full_name|default:user.username }}</div>
+                            <div style="font-size: 0.75rem; color: #666;">{{ user.get_role_display|default:"Admin" }}</div>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: #666;"></i>
+                    </button>
+                    
+                    <div class="user-dropdown-menu">
+                        <div class="dropdown-header">
+                            <div class="dropdown-header-name">{{ user.get_full_name|default:user.username }}</div>
+                            <div class="dropdown-header-email">{{ user.email|default:"No email set" }}</div>
+                        </div>
+                        
+                        <a href="{% url 'custom_admin:profile' %}" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>My Profile</span>
+                        </a>
+                        
+                        <a href="{% url 'custom_admin:profile_edit' %}" class="dropdown-item">
+                            <i class="fas fa-user-edit"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                        
+                        <div class="dropdown-divider"></div>
+                        
+                        <a href="{% url 'logout' %}" class="dropdown-item" style="color: #ff6b6b;">
+                            <i class="fas fa-sign-out-alt" style="color: #ff6b6b;"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- Main Layout with Sidebar -->
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </div>
+                
+                <a href="{% url 'custom_admin:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <div class="nav-text">
+                        <h3>Dashboard</h3>
+                        <p>Overview & stats</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="fas fa-users"></i> Patient Management
+                </div>
+                
+                <a href="{% url 'custom_admin:patient_list' %}" class="nav-item {% if 'patient_list' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="nav-text">
+                        <h3>All Patients</h3>
+                        <p>View & manage</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    <i class="fas fa-notes-medical"></i> Medical Records
+                </div>
+                
+                <a href="{% url 'custom_admin:allergy_list' %}" class="nav-item {% if 'allergy_list' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-allergies"></i>
+                    </div>
+                    <div class="nav-text">
+                        <h3>Allergies</h3>
+                        <p>All records</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'custom_admin:diagnosis_list' %}" class="nav-item {% if 'diagnosis' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <div class="nav-text">
+                        <h3>Diagnoses</h3>
+                        <p>All diagnoses</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'custom_admin:medication_list' %}" class="nav-item {% if 'medication' in request.resolver_match.url_name %}active{% endif %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div class="nav-text">
+                        <h3>Medications</h3>
+                        <p>All medications</p>
+                    </div>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="admin-main">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // Hamburger menu toggle
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('adminSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        function toggleSidebar() {
+            hamburgerBtn.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        hamburgerBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+        
+        // Close sidebar when clicking a nav link on mobile
+        const navLinks = sidebar.querySelectorAll('.nav-item');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+        
+        // User dropdown toggle
+        const userDropdown = document.getElementById('userDropdown');
+        const userDropdownBtn = document.getElementById('userDropdownBtn');
+        
+        userDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+        
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            body.classList.add('dark-mode');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save theme preference
+            const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', theme);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

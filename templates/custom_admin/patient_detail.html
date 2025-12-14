@@ -1,0 +1,177 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}{{ patient.first_name }} {{ patient.last_name }} - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Patient Header Card -->
+    <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="display: flex; gap: 2rem; align-items: start; flex-wrap: wrap;">
+            <!-- Patient Photo -->
+            <div style="flex-shrink: 0;">
+                {% if patient.photo %}
+                <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}" 
+                     style="width: 150px; height: 150px; border-radius: 15px; object-fit: cover; box-shadow: 0 8px 25px rgba(108,92,231,0.3);">
+                {% else %}
+                <div style="width: 150px; height: 150px; border-radius: 15px; background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; font-weight: 700; box-shadow: 0 8px 25px rgba(108,92,231,0.3);">
+                    {{ patient.first_name.0 }}{{ patient.last_name.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Patient Info -->
+            <div style="flex: 1; min-width: 300px;">
+                <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; color: #2F80ED;">
+                    {{ patient.first_name }} {{ patient.last_name }}
+                </h1>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 1.5rem;">
+                    <i class="fas fa-id-card"></i> Patient ID: <strong>{{ patient.patient_id }}</strong>
+                </p>
+                
+                <!-- Quick Stats -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div style="background: rgba(102,126,234,0.1); padding: 1rem; border-radius: 10px;">
+                        <div style="color: #666; font-size: 0.85rem; margin-bottom: 0.25rem;">Gender</div>
+                        <div style="font-weight: 700; font-size: 1.1rem;">{{ patient.get_gender_display }}</div>
+                    </div>
+                    
+                    <div style="background: rgba(255,107,107,0.1); padding: 1rem; border-radius: 10px;">
+                        <div style="color: #666; font-size: 0.85rem; margin-bottom: 0.25rem;">Blood Group</div>
+                        <div style="font-weight: 700; font-size: 1.1rem;">{{ patient.blood_group|default:"N/A" }}</div>
+                    </div>
+                    
+                    <div style="background: rgba(0,184,148,0.1); padding: 1rem; border-radius: 10px;">
+                        <div style="color: #666; font-size: 0.85rem; margin-bottom: 0.25rem;">Age</div>
+                        <div style="font-weight: 700; font-size: 1.1rem;">
+                            {% now "Y" as current_year %}
+                            {{ patient.date_of_birth|date:"Y"|add:"-1"|add:current_year|add:"1" }} years
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; flex-shrink: 0;">
+                <a href="{% url 'custom_admin:patient_update' patient.pk %}" class="btn" 
+                   style="background: linear-gradient(135deg, #ffd93d, #ff9800); color: white; white-space: nowrap;">
+                    <i class="fas fa-edit"></i> Edit Patient
+                </a>
+                <a href="{% url 'custom_admin:patient_delete' patient.pk %}" class="btn" 
+                   style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; white-space: nowrap;">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+                <a href="{% url 'custom_admin:patient_list' %}" class="btn btn-white" style="white-space: nowrap;">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contact Information -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.75rem;">
+            <i class="fas fa-address-book"></i> Contact Information
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+            <div>
+                <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Phone</div>
+                <div style="font-size: 1.1rem; font-weight: 600;">
+                    <i class="fas fa-phone" style="color: var(--purple-start);"></i> 
+                    {{ patient.phone|default:"Not provided" }}
+                </div>
+            </div>
+            
+            <div>
+                <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Email</div>
+                <div style="font-size: 1.1rem; font-weight: 600;">
+                    <i class="fas fa-envelope" style="color: var(--purple-start);"></i> 
+                    {{ patient.email|default:"Not provided" }}
+                </div>
+            </div>
+            
+            <div style="grid-column: 1 / -1;">
+                <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.25rem;">Address</div>
+                <div style="font-size: 1.1rem; font-weight: 600;">
+                    <i class="fas fa-map-marker-alt" style="color: var(--purple-start);"></i> 
+                    {{ patient.address|default:"Not provided" }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Medical History -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.5rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-notes-medical"></i> Medical History
+            </h3>
+            <span class="badge" style="background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); color: white; padding: 0.5rem 1rem; font-size: 1rem;">
+                {{ medical_histories|length }} Record{{ medical_histories|length|pluralize }}
+            </span>
+        </div>
+        
+        {% if medical_histories %}
+        <div style="display: grid; gap: 1rem;">
+            {% for history in medical_histories %}
+            <div style="border: 2px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: all 0.3s;" 
+                 onmouseover="this.style.borderColor='var(--purple-start)'; this.style.boxShadow='0 4px 15px rgba(108,92,231,0.2)';"
+                 onmouseout="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">
+                            Medical Record #{{ history.id }}
+                        </h4>
+                        <p style="color: #666; font-size: 0.9rem;">
+                            <i class="far fa-calendar"></i> Recorded: {{ history.date_recorded|date:"M d, Y" }}
+                        </p>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        <i class="fas fa-user-md"></i> By: {{ history.recorded_by.get_full_name|default:history.recorded_by.username }}
+                    </p>
+                </div>
+                
+                {% if history.notes %}
+                <div style="background: rgba(108,92,231,0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <strong style="color: var(--purple-start);">Notes:</strong>
+                    <p style="margin: 0.5rem 0 0 0; color: #333;">{{ history.notes }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Related Records -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="text-align: center; padding: 0.75rem; background: rgba(255,107,107,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #ff6b6b;">
+                            {{ history.allergy_set.count }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #666;">Allergies</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 0.75rem; background: rgba(253,203,110,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #ff9800;">
+                            {{ history.diagnosis_set.count }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #666;">Diagnoses</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 0.75rem; background: rgba(0,184,148,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #00B894;">
+                            {{ history.medication_set.count }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #666;">Medications</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem; color: #999;">
+            <i class="fas fa-notes-medical" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+            <h4>No medical history records</h4>
+            <p>This patient has no medical history records yet</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

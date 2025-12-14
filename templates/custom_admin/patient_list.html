@@ -1,0 +1,394 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}All Patients - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 700; color: #2F80ED; margin-bottom: 0.5rem;">
+                    <i class="fas fa-users"></i> All Patients
+                </h1>
+                <p style="color: #666;">Manage and view all patient records</p>
+            </div>
+            <button onclick="openPatientModal()" class="btn" style="background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); color: white; box-shadow: 0 4px 15px rgba(108,92,231,0.3);">
+                <i class="fas fa-user-plus"></i> Add New Patient
+            </button>
+        </div>
+    </div>
+    
+    <!-- Search and Filters -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <form method="get" action="" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search by name, ID, or email..." 
+                       style="width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <div style="min-width: 150px;">
+                <select name="gender" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+                    <option value="">All Genders</option>
+                    <option value="M" {% if gender_filter == 'M' %}selected{% endif %}>Male</option>
+                    <option value="F" {% if gender_filter == 'F' %}selected{% endif %}>Female</option>
+                    <option value="O" {% if gender_filter == 'O' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            
+            <div style="min-width: 150px;">
+                <select name="blood_group" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+                    <option value="">All Blood Types</option>
+                    <option value="A+" {% if blood_filter == 'A+' %}selected{% endif %}>A+</option>
+                    <option value="A-" {% if blood_filter == 'A-' %}selected{% endif %}>A-</option>
+                    <option value="B+" {% if blood_filter == 'B+' %}selected{% endif %}>B+</option>
+                    <option value="B-" {% if blood_filter == 'B-' %}selected{% endif %}>B-</option>
+                    <option value="AB+" {% if blood_filter == 'AB+' %}selected{% endif %}>AB+</option>
+                    <option value="AB-" {% if blood_filter == 'AB-' %}selected{% endif %}>AB-</option>
+                    <option value="O+" {% if blood_filter == 'O+' %}selected{% endif %}>O+</option>
+                    <option value="O-" {% if blood_filter == 'O-' %}selected{% endif %}>O-</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); color: white;">
+                <i class="fas fa-search"></i> Search
+            </button>
+            
+            {% if query or gender_filter or blood_filter %}
+            <a href="{% url 'custom_admin:patient_list' %}" class="btn btn-white">
+                <i class="fas fa-times"></i> Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <!-- Patients Table -->
+    <div class="card">
+        {% if page_obj %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Date of Birth</th>
+                    <th>Blood Group</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in page_obj %}
+                <tr>
+                    <td><strong>{{ patient.patient_id }}</strong></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            {% if patient.photo %}
+                            <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}" 
+                                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                                {{ patient.first_name.0 }}{{ patient.last_name.0 }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ patient.get_gender_display }}</td>
+                    <td>{{ patient.date_of_birth|date:"M d, Y" }}</td>
+                    <td>
+                        {% if patient.blood_group %}
+                        <span class="badge" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white;">
+                            {{ patient.blood_group }}
+                        </span>
+                        {% else %}
+                        <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ patient.phone|default:"N/A" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'custom_admin:patient_detail' patient.pk %}" class="btn" 
+                               style="padding: 0.5rem 1rem; font-size: 0.85rem; background: linear-gradient(135deg, #74B9FF, #0984e3); color: white;"
+                               title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'custom_admin:patient_update' patient.pk %}" class="btn" 
+                               style="padding: 0.5rem 1rem; font-size: 0.85rem; background: linear-gradient(135deg, #ffd93d, #ff9800); color: white;"
+                               title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'custom_admin:patient_delete' patient.pk %}" class="btn" 
+                               style="padding: 0.5rem 1rem; font-size: 0.85rem; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white;"
+                               title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 1.5rem; border-top: 2px solid var(--border);">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}{% if blood_filter %}&blood_group={{ blood_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}{% if blood_filter %}&blood_group={{ blood_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-left"></i>
+            </a>
+            {% endif %}
+            
+            <span style="font-weight: 600;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}{% if blood_filter %}&blood_group={{ blood_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}{% if blood_filter %}&blood_group={{ blood_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div style="text-align: center; padding: 3rem; color: #999;">
+            <i class="fas fa-users" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+            <h3>No patients found</h3>
+            <p>{% if query %}Try adjusting your search criteria{% else %}Start by adding your first patient{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Patient Modal -->
+<div id="patientModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; overflow-y: auto;">
+    <div style="min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div style="background: var(--card-bg); border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <!-- Modal Header -->
+            <div style="background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); color: white; padding: 2rem; border-radius: 20px 20px 0 0; position: sticky; top: 0; z-index: 10;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 1.75rem; font-weight: 700; margin: 0;">
+                        <i class="fas fa-user-plus"></i> Add New Patient
+                    </h2>
+                    <button onclick="closePatientModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div style="padding: 2rem;">
+                <form method="post" action="{% url 'custom_admin:patient_create' %}" enctype="multipart/form-data" id="patientForm">
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    First Name <span style="color: #ff6b6b;">*</span>
+                                </label>
+                                <input type="text" name="first_name" required class="form-control" placeholder="Enter first name">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Last Name <span style="color: #ff6b6b;">*</span>
+                                </label>
+                                <input type="text" name="last_name" required class="form-control" placeholder="Enter last name">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Gender <span style="color: #ff6b6b;">*</span>
+                                </label>
+                                <select name="gender" required class="form-control">
+                                    <option value="">Select gender</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Date of Birth <span style="color: #ff6b6b;">*</span>
+                                </label>
+                                <input type="date" name="date_of_birth" required class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-address-book"></i> Contact Information
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Phone
+                                </label>
+                                <input type="text" name="phone" class="form-control" placeholder="Enter phone number">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Email
+                                </label>
+                                <input type="email" name="email" class="form-control" placeholder="Enter email address">
+                            </div>
+                            
+                            <div style="grid-column: 1 / -1;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Address
+                                </label>
+                                <textarea name="address" class="form-control" rows="2" placeholder="Enter full address"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Contact -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: #ff6b6b; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-exclamation-triangle"></i> Emergency Contact
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Emergency Contact Name
+                                </label>
+                                <input type="text" name="emergency_contact_name" class="form-control" placeholder="Enter contact name">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Emergency Contact Phone
+                                </label>
+                                <input type="text" name="emergency_contact_phone" class="form-control" placeholder="Enter contact phone">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Medical Information -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-heartbeat"></i> Medical Information
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Blood Group
+                                </label>
+                                <select name="blood_group" class="form-control">
+                                    <option value="">Select blood group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">
+                                    Photo
+                                </label>
+                                <input type="file" name="photo" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 2px solid var(--border); justify-content: flex-end;">
+                        <button type="button" onclick="closePatientModal()" class="btn btn-white">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); color: white; box-shadow: 0 4px 15px rgba(108,92,231,0.3);">
+                            <i class="fas fa-save"></i> Save Patient
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background: var(--card-bg);
+        color: var(--text-primary);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--purple-start);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+    }
+    
+    input[type="file"].form-control {
+        border-style: dashed;
+        padding: 1rem;
+    }
+</style>
+
+<script>
+    function openPatientModal() {
+        document.getElementById('patientModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closePatientModal() {
+        document.getElementById('patientModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('patientModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePatientModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('patientModal').style.display === 'block') {
+            closePatientModal();
+        }
+    });
+</script>
+{% endblock %}

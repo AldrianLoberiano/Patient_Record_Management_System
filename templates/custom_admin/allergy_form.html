@@ -1,0 +1,216 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}{{ action }} Allergy - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 700; color: #ff6b6b; margin-bottom: 0.5rem;">
+            <i class="fas {% if action == 'Create' %}fa-plus-circle{% else %}fa-edit{% endif %}"></i> {{ action }} Allergy Record
+        </h1>
+        <p style="color: #666;">
+            {% if action == 'Create' %}
+            Document a new patient allergy for safety and medical care
+            {% else %}
+            Update allergy information for {{ allergy.allergen }}
+            {% endif %}
+        </p>
+    </div>
+    
+    <!-- Safety Warning Banner -->
+    <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(255,107,107,0.3);">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+            <div>
+                <strong style="font-size: 1.1rem; display: block; margin-bottom: 0.25rem;">Critical Medical Information</strong>
+                <p style="margin: 0; opacity: 0.95;">Ensure all allergy details are accurate. This information is vital for patient safety.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div style="background: #ffe0e0; border-left: 4px solid #ff6b6b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong style="color: #d32f2f;">
+                    <i class="fas fa-exclamation-circle"></i> Please correct the errors below:
+                </strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem; color: #d32f2f;">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <!-- Patient Selection -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-user-circle"></i> Patient Selection
+                </h3>
+                
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                        Patient <span style="color: #ff6b6b;">*</span>
+                    </label>
+                    {{ form.patient }}
+                    <small style="color: #666; display: block; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Select the patient for this allergy record
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Allergy Details -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-flask"></i> Allergy Details
+                </h3>
+                
+                <div style="display: grid; gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Allergen <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.allergen }}
+                        <small style="color: #666; display: block; margin-top: 0.5rem;">
+                            <i class="fas fa-lightbulb"></i> Common allergens: Penicillin, Peanuts, Shellfish, Latex, Pollen, Aspirin, Sulfa drugs
+                        </small>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Reaction <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.reaction }}
+                        <small style="color: #666; display: block; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> Describe the allergic reaction symptoms
+                        </small>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Severity Level <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <label style="padding: 1rem; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem;">
+                                <input type="radio" name="severity" value="mild" {% if form.severity.value == 'mild' %}checked{% endif %} style="width: 20px; height: 20px;">
+                                <div>
+                                    <strong style="display: block; color: #4caf50;"><i class="fas fa-check-circle"></i> Mild</strong>
+                                    <small style="color: #666;">Minor discomfort</small>
+                                </div>
+                            </label>
+                            
+                            <label style="padding: 1rem; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem;">
+                                <input type="radio" name="severity" value="moderate" {% if form.severity.value == 'moderate' %}checked{% endif %} style="width: 20px; height: 20px;">
+                                <div>
+                                    <strong style="display: block; color: #ff9800;"><i class="fas fa-exclamation-circle"></i> Moderate</strong>
+                                    <small style="color: #666;">Significant reaction</small>
+                                </div>
+                            </label>
+                            
+                            <label style="padding: 1rem; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem;">
+                                <input type="radio" name="severity" value="severe" {% if form.severity.value == 'severe' %}checked{% endif %} style="width: 20px; height: 20px;">
+                                <div>
+                                    <strong style="display: block; color: #f57c00;"><i class="fas fa-exclamation-triangle"></i> Severe</strong>
+                                    <small style="color: #666;">Serious symptoms</small>
+                                </div>
+                            </label>
+                            
+                            <label style="padding: 1rem; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem;">
+                                <input type="radio" name="severity" value="life_threatening" {% if form.severity.value == 'life_threatening' %}checked{% endif %} style="width: 20px; height: 20px;">
+                                <div>
+                                    <strong style="display: block; color: #ff6b6b;"><i class="fas fa-skull-crossbones"></i> Life Threatening</strong>
+                                    <small style="color: #666;">Anaphylaxis risk</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Date Identified <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.identified_date }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Clinical Notes -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-notes-medical"></i> Clinical Notes
+                </h3>
+                
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                        Additional Notes
+                    </label>
+                    {{ form.notes }}
+                    <small style="color: #666; display: block; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Any additional information about treatment, onset, or management
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 2px solid var(--border);">
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; box-shadow: 0 4px 15px rgba(255,107,107,0.3);">
+                    <i class="fas fa-save"></i> Save Allergy Record
+                </button>
+                <a href="{% url 'custom_admin:allergy_list' %}" class="btn btn-white">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--purple-start);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+    
+    textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    input[type="radio"]:checked + div strong {
+        font-weight: 700;
+    }
+    
+    label:has(input[type="radio"]:checked) {
+        border-color: var(--purple-start);
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    label:has(input[type="radio"]):hover {
+        border-color: var(--purple-start);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+    }
+</style>
+{% endblock %}

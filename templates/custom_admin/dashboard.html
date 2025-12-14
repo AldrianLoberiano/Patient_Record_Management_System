@@ -1,0 +1,119 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Dashboard - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Statistics Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ total_patients }}</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-icon purple">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ total_allergies }}</div>
+                    <div class="stat-label">Allergy Records</div>
+                </div>
+                <div class="stat-icon danger">
+                    <i class="fas fa-allergies"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ total_diagnoses }}</div>
+                    <div class="stat-label">Diagnoses</div>
+                </div>
+                <div class="stat-icon warning">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <div class="stat-value">{{ total_medications }}</div>
+                    <div class="stat-label">Medications</div>
+                </div>
+                <div class="stat-icon success">
+                    <i class="fas fa-pills"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <h2 class="section-title"><i class="fas fa-clock"></i> Recent Activity</h2>
+    
+    {% if critical_allergies %}
+    <div class="card">
+        <h3 style="color: #ff6b6b; margin-bottom: 1rem;">
+            <i class="fas fa-exclamation-triangle"></i> Critical Allergies
+        </h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Allergen</th>
+                    <th>Severity</th>
+                    <th>Date Identified</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for allergy in critical_allergies %}
+                <tr>
+                    <td>{{ allergy.medical_history.patient.first_name }} {{ allergy.medical_history.patient.last_name }}</td>
+                    <td>{{ allergy.allergen }}</td>
+                    <td><span class="badge severe">{{ allergy.get_severity_display }}</span></td>
+                    <td>{{ allergy.identified_date|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    {% if recent_patients %}
+    <div class="card">
+        <h3 style="margin-bottom: 1rem;">
+            <i class="fas fa-user-clock"></i> Recent Patients
+        </h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Blood Group</th>
+                    <th>Registered</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in recent_patients %}
+                <tr>
+                    <td>{{ patient.patient_id }}</td>
+                    <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                    <td>{{ patient.get_gender_display }}</td>
+                    <td>{{ patient.blood_group|default:"—" }}</td>
+                    <td>{{ patient.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

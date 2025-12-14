@@ -10,7 +10,7 @@ from .forms import (CustomUserCreationForm, LoginForm, PatientForm,
 
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect('custom_admin:dashboard')
     
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -20,8 +20,7 @@ def user_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, f'Welcome back, {user.first_name}!')
-                return redirect('dashboard')
+                return redirect('custom_admin:dashboard')
     else:
         form = LoginForm()
     

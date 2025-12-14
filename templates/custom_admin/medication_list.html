@@ -1,0 +1,200 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}All Medications - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: 700; color: #4fc3f7; margin-bottom: 0.5rem;">
+                    <i class="fas fa-pills"></i> Medication Records
+                </h1>
+                <p style="color: #666;">Manage patient medication prescriptions and treatments</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="stats-card" style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Total Medications</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #4fc3f7;">
+                        {{ total_count }}
+                    </div>
+                </div>
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #4fc3f7, #29b6f6); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white;">
+                    <i class="fas fa-pills"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card" style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Active Prescriptions</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #4caf50;">
+                        {{ active_count }}
+                    </div>
+                </div>
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #6bcf7f, #4caf50); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white;">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card" style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Unique Patients</div>
+                    <div style="font-size: 2rem; font-weight: 700; color: #667eea;">
+                        {{ unique_patients }}
+                    </div>
+                </div>
+                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: white;">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Search and Filters -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <form method="get" action="" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px;">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search by medication name, patient, or prescriber..." 
+                       style="width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <div style="min-width: 180px;">
+                <select name="is_active" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem;">
+                    <option value="">All Status</option>
+                    <option value="true" {% if active_filter == 'true' %}selected{% endif %}>Active</option>
+                    <option value="false" {% if active_filter == 'false' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn" style="background: linear-gradient(135deg, #4fc3f7, #29b6f6); color: white;">
+                <i class="fas fa-search"></i> Search
+            </button>
+            
+            {% if query or active_filter %}
+            <a href="{% url 'custom_admin:medication_list' %}" class="btn btn-white">
+                <i class="fas fa-times"></i> Clear
+            </a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <!-- Medications Table -->
+    <div class="card">
+        {% if page_obj %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Medication</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Start Date</th>
+                    <th>Prescribed By</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for medication in page_obj %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            {% if medication.medical_history.patient.photo %}
+                            <img src="{{ medication.medical_history.patient.photo.url }}" 
+                                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #4fc3f7, #29b6f6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                {{ medication.medical_history.patient.first_name.0 }}{{ medication.medical_history.patient.last_name.0 }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <strong>{{ medication.medical_history.patient.first_name }} {{ medication.medical_history.patient.last_name }}</strong>
+                                <br>
+                                <small style="color: #666;">{{ medication.medical_history.patient.patient_id }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong style="color: #29b6f6;">{{ medication.medication_name }}</strong>
+                        {% if medication.purpose %}
+                        <br>
+                        <small style="color: #666;">{{ medication.purpose|truncatewords:8 }}</small>
+                        {% endif %}
+                    </td>
+                    <td><strong>{{ medication.dosage }}</strong></td>
+                    <td>{{ medication.frequency }}</td>
+                    <td>{{ medication.start_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if medication.prescribed_by %}
+                        <strong>{{ medication.prescribed_by.get_full_name }}</strong>
+                        {% else %}
+                        <span style="color: #999;">Not specified</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if medication.is_active %}
+                        <span class="badge" style="background: linear-gradient(135deg, #6bcf7f, #4caf50); color: white;">
+                            <i class="fas fa-check-circle"></i> Active
+                        </span>
+                        {% else %}
+                        <span class="badge" style="background: linear-gradient(135deg, #e0e0e0, #bdbdbd); color: #333;">
+                            <i class="fas fa-ban"></i> Inactive
+                        </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 1.5rem; border-top: 2px solid var(--border);">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&is_active={{ active_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&is_active={{ active_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-left"></i>
+            </a>
+            {% endif %}
+            
+            <span style="font-weight: 600;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&is_active={{ active_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if active_filter %}&is_active={{ active_filter }}{% endif %}" 
+               class="btn btn-white">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div style="text-align: center; padding: 3rem; color: #999;">
+            <i class="fas fa-pills" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+            <h3>No medication records found</h3>
+            <p>{% if query %}Try adjusting your search criteria{% else %}Start by adding a new medication record{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

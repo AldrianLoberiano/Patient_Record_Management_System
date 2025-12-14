@@ -1,0 +1,212 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}{{ action }} Patient - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 700; color: #2F80ED; margin-bottom: 0.5rem;">
+            <i class="fas {% if action == 'Create' %}fa-user-plus{% else %}fa-user-edit{% endif %}"></i> {{ action }} Patient
+        </h1>
+        <p style="color: #666;">
+            {% if action == 'Create' %}
+            Fill in the details below to register a new patient
+            {% else %}
+            Update patient information for {{ patient.first_name }} {{ patient.last_name }}
+            {% endif %}
+        </p>
+    </div>
+    
+    <!-- Form Card -->
+    <div class="card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div style="background: #ffe0e0; border-left: 4px solid #ff6b6b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong style="color: #d32f2f;">
+                    <i class="fas fa-exclamation-circle"></i> Please correct the errors below:
+                </strong>
+                <ul style="margin: 0.5rem 0 0 1.5rem; color: #d32f2f;">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <!-- Personal Information -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-user"></i> Personal Information
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            First Name <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.first_name }}
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Last Name <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.last_name }}
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Gender <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.gender }}
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Date of Birth <span style="color: #ff6b6b;">*</span>
+                        </label>
+                        {{ form.date_of_birth }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-address-book"></i> Contact Information
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Phone
+                        </label>
+                        {{ form.phone }}
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Email
+                        </label>
+                        {{ form.email }}
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Address
+                        </label>
+                        {{ form.address }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Emergency Contact -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: #ff6b6b; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Emergency Contact
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Emergency Contact Name
+                        </label>
+                        {{ form.emergency_contact_name }}
+                        <small style="color: #666; display: block; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> Name of person to contact in case of emergency
+                        </small>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Emergency Contact Phone
+                        </label>
+                        {{ form.emergency_contact_phone }}
+                        <small style="color: #666; display: block; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> Phone number to reach emergency contact
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Medical Information -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--purple-start); display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-heartbeat"></i> Medical Information
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Blood Group
+                        </label>
+                        {{ form.blood_group }}
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--dark);">
+                            Photo
+                        </label>
+                        {{ form.photo }}
+                        {% if patient.photo %}
+                        <div style="margin-top: 1rem;">
+                            <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}" 
+                                 style="max-width: 150px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Actions -->
+            <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 2px solid var(--border);">
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); color: white; box-shadow: 0 4px 15px rgba(108,92,231,0.3);">
+                    <i class="fas fa-save"></i> Save Patient
+                </button>
+                <a href="{% url 'custom_admin:patient_list' %}" class="btn btn-white">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--purple-start);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+    
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    input[type="file"] {
+        border: 2px dashed var(--border);
+        padding: 1rem;
+    }
+</style>
+{% endblock %}

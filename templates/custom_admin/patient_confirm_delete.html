@@ -1,0 +1,97 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Delete Patient - MediCare Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <div style="max-width: 600px; margin: 3rem auto;">
+        <!-- Warning Card -->
+        <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 8px 30px rgba(255,107,107,0.3); border: 3px solid #ff6b6b;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; animation: pulse 2s ease-in-out infinite;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: white;"></i>
+                </div>
+                <h1 style="font-size: 2rem; font-weight: 700; color: #ff6b6b; margin-bottom: 0.5rem;">
+                    Delete Patient Record
+                </h1>
+                <p style="color: #666; font-size: 1.1rem;">
+                    This action cannot be undone
+                </p>
+            </div>
+            
+            <!-- Patient Info -->
+            <div style="background: rgba(255,107,107,0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    {% if patient.photo %}
+                    <img src="{{ patient.photo.url }}" alt="{{ patient.first_name }}" 
+                         style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    {% else %}
+                    <div style="width: 80px; height: 80px; border-radius: 12px; background: linear-gradient(135deg, var(--purple-start), var(--purple-end)); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700;">
+                        {{ patient.first_name.0 }}{{ patient.last_name.0 }}
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                            {{ patient.first_name }} {{ patient.last_name }}
+                        </h3>
+                        <p style="color: #666; margin-bottom: 0.25rem;">
+                            <i class="fas fa-id-card"></i> {{ patient.patient_id }}
+                        </p>
+                        <p style="color: #666; margin: 0;">
+                            <i class="fas fa-calendar"></i> DOB: {{ patient.date_of_birth|date:"M d, Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Warning Message -->
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+                <strong style="color: #856404;">
+                    <i class="fas fa-exclamation-circle"></i> Warning:
+                </strong>
+                <p style="margin: 0.5rem 0 0 0; color: #856404;">
+                    Deleting this patient will also permanently remove:
+                </p>
+                <ul style="margin: 0.5rem 0 0 1.5rem; color: #856404;">
+                    <li>All medical history records</li>
+                    <li>All allergy records</li>
+                    <li>All diagnosis records</li>
+                    <li>All medication records</li>
+                    <li>Patient photo and documents</li>
+                </ul>
+            </div>
+            
+            <!-- Confirmation Form -->
+            <form method="post">
+                {% csrf_token %}
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn" 
+                            style="flex: 1; background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; box-shadow: 0 4px 15px rgba(255,107,107,0.4); font-size: 1.1rem; padding: 1rem;">
+                        <i class="fas fa-trash"></i> Yes, Delete Permanently
+                    </button>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <a href="{% url 'custom_admin:patient_detail' patient.pk %}" class="btn btn-white" 
+                       style="width: 100%; display: flex; justify-content: center; background: white; color: var(--dark); border: 2px solid var(--border);">
+                        <i class="fas fa-times"></i> Cancel, Keep Patient
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 8px 25px rgba(255,107,107,0.3);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(255,107,107,0.5);
+        }
+    }
+</style>
+{% endblock %}

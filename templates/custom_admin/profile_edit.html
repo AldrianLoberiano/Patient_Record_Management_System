@@ -1,0 +1,337 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Edit Profile - MediCare Admin{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+    
+    .form-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-header p {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 0.95rem;
+    }
+    
+    .form-label i {
+        margin-right: 0.5rem;
+        color: var(--purple-start);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--purple-start);
+        box-shadow: 0 0 0 3px rgba(86, 204, 242, 0.1);
+    }
+    
+    .form-control-file {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px dashed #e0e0e0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .form-control-file:hover {
+        border-color: var(--purple-start);
+        background: rgba(86, 204, 242, 0.05);
+    }
+    
+    .help-text {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+    }
+    
+    .errorlist li {
+        color: #ff6b6b;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+    
+    .btn-submit {
+        flex: 1;
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #56CCF2, #2F80ED);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(47, 128, 237, 0.3);
+    }
+    
+    .btn-cancel {
+        flex: 1;
+        padding: 1rem 2rem;
+        background: white;
+        color: var(--dark);
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .btn-cancel:hover {
+        border-color: var(--purple-start);
+        background: rgba(86, 204, 242, 0.05);
+    }
+    
+    .current-picture {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #56CCF2, #2F80ED);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
+            <p>Update your personal information and account settings</p>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" style="padding: 1rem; margin-bottom: 1.5rem; border-radius: 10px; {% if message.tags == 'success' %}background: #d4edda; color: #155724; border-left: 4px solid #28a745;{% else %}background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545;{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Profile Picture -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-camera"></i> Profile Picture
+                </label>
+                {% if user.profile_picture %}
+                    <div class="current-picture">
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    </div>
+                {% else %}
+                    <div class="current-picture">
+                        {% if user.first_name %}
+                            {{ user.first_name.0 }}{{ user.last_name.0|default:"" }}
+                        {% else %}
+                            {{ user.username.0|upper }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {{ form.profile_picture }}
+                {% if form.profile_picture.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.profile_picture.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <!-- Name Fields -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">
+                        <i class="fas fa-user"></i> First Name
+                    </label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.first_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">
+                        <i class="fas fa-user"></i> Last Name
+                    </label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.last_name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="id_email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_phone">
+                        <i class="fas fa-phone"></i> Phone Number
+                    </label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.phone.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Professional Information (if doctor) -->
+            {% if user.role == 'doctor' %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="id_specialization">
+                        <i class="fas fa-stethoscope"></i> Specialization
+                    </label>
+                    {{ form.specialization }}
+                    {% if form.specialization.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.specialization.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_license_number">
+                        <i class="fas fa-id-card"></i> License Number
+                    </label>
+                    {{ form.license_number }}
+                    {% if form.license_number.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.license_number.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="{% url 'custom_admin:profile' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
