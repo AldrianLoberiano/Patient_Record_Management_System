@@ -191,7 +191,7 @@
         
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}" style="padding: 1rem; margin-bottom: 1.5rem; border-radius: 10px; {% if message.tags == 'success' %}background: #d4edda; color: #155724; border-left: 4px solid #28a745;{% else %}background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545;{% endif %}">
+                <div class="alert alert-{{ message.tags }}" style="padding: 1rem; margin-bottom: 1.5rem; border-radius: 10px; {% if message.tags == 'success' %}background: #d4edda; color: #155724; border-left: 4px solid #28a745{% else %}background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545{% endif %};">
                     {{ message }}
                 </div>
             {% endfor %}
