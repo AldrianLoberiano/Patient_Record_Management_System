@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏥 Patient Record Management System
+# Patient Record Management System
 
 ### Modern Medical Records Platform Built with Django
 
@@ -17,20 +17,20 @@
 
 </div>
 
-## ✨ Key Highlights
+##  Key Highlights
 
-- 🎨 **Modern UI Design** - Trendy purple gradient theme with smooth animations
-- 🔐 **Secure Authentication** - User login, registration, and role-based access
-- 📊 **Complete Patient Records** - Medical history, diagnoses, medications, and allergies
-- 💊 **Medical-Grade Interface** - Professional admin panel with safety features
-- 📱 **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
-- ⚡ **Real-time Updates** - Dynamic forms with autocomplete and validation
-- 🎯 **Safety Features** - Severity warnings, unsaved changes protection
-- 🚀 **Easy Setup** - SQLite for development, MySQL for production
+-  **Modern UI Design** - Trendy purple gradient theme with smooth animations
+-  **Secure Authentication** - User login, registration, and role-based access
+-  **Complete Patient Records** - Medical history, diagnoses, medications, and allergies
+-  **Medical-Grade Interface** - Professional admin panel with safety features
+-  **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
+-  **Real-time Updates** - Dynamic forms with autocomplete and validation
+-  **Safety Features** - Severity warnings, unsaved changes protection
+-  **Easy Setup** - SQLite for development, MySQL for production
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Installation Guide](#step-by-step-guide-to-run-the-project)
@@ -185,7 +185,7 @@ Open your web browser and navigate to:
 
 ---
 
-## 🔑 Admin Login
+##  Admin Login
 
 **Default Admin Credentials:**
 
@@ -194,7 +194,7 @@ Username: admin
 Password: admin123
 ```
 
-> ⚠️ **Important:** Change these credentials in production!
+>  **Important:** Change these credentials in production!
 
 **Admin Features:**
 
@@ -208,15 +208,15 @@ Password: admin123
 
 ---
 
-## 🚀 Project Features
+##  Project Features
 
-### 👥 User Management
+###  User Management
 
 - ✅ **Secure Authentication** - Login, logout, and user registration
 - ✅ **Role-Based Access** - Custom user roles (Doctor, Nurse, Admin, Receptionist)
 - ✅ **Profile Management** - User profiles with phone, specialization, license number
 
-### 📊 Patient Records
+###  Patient Records
 
 - ✅ **Patient Management** - Add, view, edit, and delete patient records
 - ✅ **Medical History** - Comprehensive patient medical history tracking
@@ -224,7 +224,7 @@ Password: admin123
 - ✅ **Medications** - Track prescribed medications with dosage and schedules
 - ✅ **Allergies** - Modern medical-grade allergy management interface
 
-### 🎨 Modern UI/UX
+###  Modern UI/UX
 
 - ✅ **Trendy Purple Gradient Theme** - Vibrant #667eea → #764ba2 gradient design
 - ✅ **Animated Interface** - Smooth floating shapes and transitions
@@ -232,7 +232,7 @@ Password: admin123
 - ✅ **Responsive Layout** - Perfect on desktop, tablet, and mobile
 - ✅ **Font Awesome Icons** - Professional iconography throughout
 
-### 🔐 Admin Panel (Styled Globally)
+###  Admin Panel (Styled Globally)
 
 - ✅ **Complete UI Transformation** - All admin pages styled with modern theme
 - ✅ **Dashboard** - Beautiful gradient background with animated shapes
@@ -241,7 +241,7 @@ Password: admin123
 - ✅ **Search & Filters** - Enhanced search bars and filter sidebars
 - ✅ **Login Page** - Centered card design with gradient background
 
-### ⚡ Advanced Features
+###  Advanced Features
 
 - ✅ **Autocomplete** - Smart suggestions for medical history selection
 - ✅ **Severity Warnings** - Visual alerts for critical allergies
@@ -251,7 +251,7 @@ Password: admin123
 - ✅ **Pagination** - Smooth navigation through large datasets
 - ✅ **Real-time Validation** - Instant feedback on form inputs
 
-### 📱 Technical Features
+###  Technical Features
 
 - ✅ **Django 5.0.1** - Latest stable Django framework
 - ✅ **MySQL Support** - Production-ready database integration
@@ -354,7 +354,7 @@ python manage.py shell
 
 ## Security Notes
 
-⚠️ **Important for Production:**
+ **Important for Production:**
 
 - Change the `SECRET_KEY` in `settings.py`
 - Set `DEBUG = False` in `settings.py`
