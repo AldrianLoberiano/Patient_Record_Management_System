@@ -7,7 +7,6 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-5.0.1-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![License](https://img.shields.io/badge/License-Educational-green?style=for-the-badge)](LICENSE)
 
 **A comprehensive Django-based web application for managing patient medical records with a modern, trendy purple gradient UI**
 
@@ -363,6 +362,8 @@ python manage.py shell
 - Use a production-grade database (PostgreSQL/MySQL)
 - Configure proper static file serving (WhiteNoise/Nginx)
 
-## License
+## Copyright Notice
 
-This project is for my personal project only.
+Copyright © 2026 Aldrian Loberiano.  
+This project is intended strictly for personal use.  
+Any unauthorized commercial use, distribution, or copying of the code or materials in this repository is prohibited and may constitute copyright infringement.
